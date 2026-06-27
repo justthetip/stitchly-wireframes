@@ -2,10 +2,22 @@ import Link from "next/link";
 import { ChevronRight, Plus } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { patterns, projects, getPattern } from "@/lib/mock-data";
 
-export default function HomePage() {
-  const active = projects.filter((p) => p.status === "active");
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ empty?: string }>;
+}) {
+  const { empty } = await searchParams;
+  // Wireframe-only: ?empty previews the no-projects state, ?empty=new the
+  // brand-new-user state (no patterns either). Toggle lives at the bottom.
+  const view = empty === undefined ? "populated" : empty === "new" ? "new" : "projects";
+  const forceEmpty = view !== "populated";
+  const hasPatterns = view === "new" ? false : patterns.length > 0;
+
+  const active = forceEmpty ? [] : projects.filter((p) => p.status === "active");
   const current = active[0];
   const currentPattern = current && getPattern(current.patternId);
 
@@ -21,7 +33,7 @@ export default function HomePage() {
         </h1>
       </div>
 
-      {active.length === 0 && <HomeEmptyState hasPatterns={patterns.length > 0} />}
+      {active.length === 0 && <HomeEmptyState hasPatterns={hasPatterns} />}
 
       {/* Continue making — hero */}
       {current && currentPattern && (
@@ -110,6 +122,43 @@ export default function HomePage() {
         </div>
       </section>
       )}
+
+      <PreviewToggle current={view} />
+    </div>
+  );
+}
+
+function PreviewToggle({
+  current,
+}: {
+  current: "populated" | "projects" | "new";
+}) {
+  const options = [
+    { key: "populated", label: "Populated", href: "/" },
+    { key: "projects", label: "No projects", href: "/?empty" },
+    { key: "new", label: "New user", href: "/?empty=new" },
+  ] as const;
+  return (
+    <div className="mt-2 border-t border-dashed border-border px-5 py-4">
+      <p className="mb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+        Preview state · wireframe only
+      </p>
+      <div className="inline-flex rounded-full border border-border bg-muted p-0.5 text-[11px] font-medium">
+        {options.map((o) => (
+          <Link
+            key={o.key}
+            href={o.href}
+            className={cn(
+              "rounded-full px-3 py-1 transition",
+              current === o.key
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground"
+            )}
+          >
+            {o.label}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
