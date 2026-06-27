@@ -1,14 +1,13 @@
 import Link from "next/link";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { patterns, projects, getPattern } from "@/lib/mock-data";
 
 export default function HomePage() {
   const active = projects.filter((p) => p.status === "active");
   const current = active[0];
   const currentPattern = current && getPattern(current.patternId);
-  const recentPatterns = patterns.slice(0, 3);
 
   return (
     <div className="flex flex-col">
@@ -20,14 +19,9 @@ export default function HomePage() {
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">
           Hello, Melissa
         </h1>
-        <Link
-          href="/library"
-          className="mt-4 flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm text-muted-foreground"
-        >
-          <Search className="size-4" />
-          Search your patterns…
-        </Link>
       </div>
+
+      {active.length === 0 && <HomeEmptyState hasPatterns={patterns.length > 0} />}
 
       {/* Continue making — hero */}
       {current && currentPattern && (
@@ -76,7 +70,8 @@ export default function HomePage() {
       )}
 
       {/* Active projects */}
-      <section className="px-5 pt-6">
+      {active.length > 0 && (
+      <section className="px-5 pt-6 pb-6">
         <div className="mb-2 flex items-baseline justify-between">
           <h2 className="text-sm font-semibold">Active projects</h2>
           <Link
@@ -114,39 +109,42 @@ export default function HomePage() {
           })}
         </div>
       </section>
-
-      {/* Recently added patterns */}
-      <section className="px-5 pt-6 pb-6">
-        <div className="mb-2 flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold">Recently added</h2>
-          <Link href="/library" className="text-xs font-medium text-primary">
-            Library
-          </Link>
-        </div>
-        <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-1">
-          {recentPatterns.map((pat) => (
-            <Link
-              key={pat.id}
-              href={`/library/${pat.id}`}
-              className="w-36 shrink-0 rounded-xl border border-border bg-card p-3"
-            >
-              <div className="mb-2 flex aspect-square w-full items-center justify-center rounded-lg bg-accent text-4xl">
-                {pat.cover}
-              </div>
-              <p className="truncate text-xs font-semibold">{pat.name}</p>
-              <p className="truncate text-[10px] text-muted-foreground">
-                {pat.designer}
-              </p>
-              <Badge
-                variant="secondary"
-                className="mt-2 text-[10px] font-normal"
-              >
-                {pat.craft}
-              </Badge>
-            </Link>
-          ))}
-        </div>
-      </section>
+      )}
     </div>
+  );
+}
+
+function HomeEmptyState({ hasPatterns }: { hasPatterns: boolean }) {
+  return (
+    <section className="px-5 pt-2 pb-6">
+      <div className="flex flex-col items-center rounded-2xl border border-dashed border-border bg-card px-6 py-10 text-center">
+        <div className="flex size-16 items-center justify-center rounded-2xl bg-accent text-3xl">
+          🧶
+        </div>
+        <h2 className="mt-4 text-base font-semibold">
+          Nothing on the needles yet
+        </h2>
+        <p className="mt-1.5 max-w-[16rem] text-sm text-muted-foreground">
+          {hasPatterns
+            ? "Pick a pattern from your library and start a project — your rows, notes and progress all live here."
+            : "Add your first pattern, then start a project. We’ll keep your place so you can pick up right where you left off."}
+        </p>
+        <Link
+          href={hasPatterns ? "/projects/new" : "/library/upload"}
+          className={buttonVariants({ size: "lg", className: "mt-5 w-full" })}
+        >
+          <Plus className="size-4" />
+          {hasPatterns ? "Start a project" : "Add a pattern"}
+        </Link>
+        {hasPatterns && (
+          <Link
+            href="/library"
+            className="mt-3 text-xs font-medium text-primary"
+          >
+            Browse your library
+          </Link>
+        )}
+      </div>
+    </section>
   );
 }
