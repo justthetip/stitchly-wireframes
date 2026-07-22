@@ -14,7 +14,7 @@ Melissa already has designs and the domain context for a knitting app, so that�
 
 * **Tiago —** backend, architecture and AI orchestration to really sink into.
 
-* **Luke —** building with Claude, and keeping the whole thing moving.
+* **Luke —** building with Codex, and keeping the whole thing moving.
 
 All three of us get the rare bit — a real product actually shipped, not just an idea we talked about. These days that’s the hard part, not the idea.
 
@@ -28,7 +28,7 @@ Short milestones over \~2-week windows. We agree what “done” looks like befo
 | :---- | :---- | :---- |
 | **Melissa** | Product — scope, priority, what “done” means — and design | — |
 | **Tiago** | Architecture, stack, AI orchestration — owns the technical shape | Building |
-| **Luke** | Building with Claude (front-end / app / prototyping), plus unofficial PM — keeps this doc current, nudges the weekly check-in, calls a hop-on when we’re stuck | Product scaffolding |
+| **Luke** | Building with Codex (front-end / app / prototyping), plus unofficial PM — keeps this doc current, nudges the weekly check-in, calls a hop-on when we’re stuck | Product scaffolding |
 
 *Overlap is expected — we all contribute across lanes. The point is one clear decision-owner per lane, so calls actually get made and nothing stalls.*
 

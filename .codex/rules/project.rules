@@ -1,0 +1,80 @@
+# Project-specific commands Codex may run outside the sandbox without prompting.
+# Keep these prefixes narrow; sandboxing still applies to all other commands.
+
+prefix_rule(
+    pattern = ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "https://github.com/justthetip/stitchly-wireframes"],
+    decision = "allow",
+    justification = "Check whether the project GitHub repository is reachable.",
+)
+
+prefix_rule(
+    pattern = ["git", "ls-remote"],
+    decision = "allow",
+    justification = "Inspect remote Git references for this project.",
+)
+
+prefix_rule(
+    pattern = ["npx", "--yes", "create-next-app@latest", ".", "--typescript", "--tailwind", "--eslint", "--app", "--src-dir", "--import-alias", "@/*", "--use-npm", "--yes"],
+    decision = "allow",
+    justification = "Recreate the project's established Next.js scaffold.",
+)
+
+prefix_rule(
+    pattern = ["npx", "--yes", "shadcn@latest", "init", "-d"],
+    decision = "allow",
+    justification = "Initialize shadcn with this project's established defaults.",
+)
+
+prefix_rule(
+    pattern = ["npx", "--yes", "shadcn@latest", "add", "card", "input", "badge", "progress", "sheet", "separator", "scroll-area", "dialog", "textarea", "label", "tabs", "alert", "-y"],
+    decision = "allow",
+    justification = "Add the established shadcn component set to this project.",
+)
+
+prefix_rule(
+    pattern = ["npm", "run"],
+    decision = "allow",
+    justification = "Run scripts defined by this project.",
+)
+
+prefix_rule(
+    pattern = ["git", ["add", "commit", "remote", "push", "config"]],
+    decision = "allow",
+    justification = "Use the Git operations previously approved for this project.",
+)
+
+prefix_rule(
+    pattern = ["gh", "auth"],
+    decision = "allow",
+    justification = "Manage GitHub CLI authentication for this project.",
+)
+
+prefix_rule(
+    pattern = ["env", "-u", "GITHUB_TOKEN", "gh", "auth"],
+    decision = "allow",
+    justification = "Run GitHub authentication without an inherited token.",
+)
+
+prefix_rule(
+    pattern = ["env", "GH_PROMPT_DISABLED=1", "gh", "auth", "login", "--hostname", "github.com", "--git-protocol", "https", "--web"],
+    decision = "allow",
+    justification = "Start the approved browser-based GitHub CLI login flow.",
+)
+
+prefix_rule(
+    pattern = ["vercel", ["whoami", "logout", "login", "link", "deploy"]],
+    decision = "allow",
+    justification = "Authenticate, link, and deploy this project with Vercel.",
+)
+
+prefix_rule(
+    pattern = ["curl", "-s", "-o", "/dev/null", "-w", "HTTP %{http_code}  size=%{size_download}b\\n", "https://stitchly-wireframes.vercel.app"],
+    decision = "allow",
+    justification = "Check the deployed prototype's HTTP status and response size.",
+)
+
+prefix_rule(
+    pattern = ["curl", "-s", "https://stitchly-wireframes.vercel.app"],
+    decision = "allow",
+    justification = "Inspect the deployed prototype response.",
+)
