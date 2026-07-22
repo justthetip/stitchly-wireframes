@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, Check, FileText, Pencil, Sparkles } from "lucide-react";
+import { AlertTriangle, Check, FileText, Pencil, Sparkles, Plus } from "lucide-react";
 import { ScreenHeader } from "@/components/screen-header";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -12,12 +12,13 @@ import { cn } from "@/lib/utils";
 export default function ReviewParsePage() {
   const [rows, setRows] = useState<ParsedRow[]>(sampleParsed);
   const [editing, setEditing] = useState<number | null>(null);
+  const [saved, setSaved] = useState(false);
 
   const lowCount = rows.filter((r) => r.confidence === "low").length;
   const medCount = rows.filter((r) => r.confidence === "medium").length;
 
   return (
-    <div className="flex flex-col pb-32">
+    <div className="flex flex-col pb-32 md:px-3">
       <ScreenHeader
         back="/library/upload"
         title="Review parsed rows"
@@ -74,8 +75,8 @@ export default function ReviewParsePage() {
       </div>
 
       <div className="px-5 pt-4">
-        <button className="w-full rounded-xl border border-dashed border-border bg-card px-3 py-3 text-xs font-medium text-muted-foreground hover:bg-muted">
-          + Add a missing row
+        <button onClick={() => setRows(current => [...current, { n: current.length + 1, instructions: "Add the missing instruction", confidence: "medium" }])} className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/25 bg-card px-3 py-3 text-xs font-extrabold text-primary hover:bg-primary/5">
+          <Plus className="size-4"/> Add a missing row
         </button>
       </div>
 
@@ -88,12 +89,7 @@ export default function ReviewParsePage() {
           >
             Cancel
           </Link>
-          <Link
-            href="/library/amigurumi-bunny"
-            className={cn(buttonVariants({ size: "lg" }), "flex-1")}
-          >
-            Save pattern
-          </Link>
+          {saved ? <Link href="/library" className={cn(buttonVariants({ size: "lg" }), "flex-1 bg-[#2e6b46]")}>Open your library</Link> : <button onClick={()=>{let name="Imported pattern.pdf";const upload=sessionStorage.getItem("stitchly:last-upload");if(upload){try{name=JSON.parse(upload).name}catch{}}localStorage.setItem("stitchly:saved-pattern",JSON.stringify({name,savedAt:new Date().toISOString()}));setSaved(true)}} className={cn(buttonVariants({ size: "lg" }), "flex-1")}>Save pattern</button>}
         </div>
         <p className="mt-1.5 text-center text-[10px] text-muted-foreground">
           You can fix rows later from the pattern detail screen

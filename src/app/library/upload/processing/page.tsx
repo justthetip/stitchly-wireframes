@@ -2,90 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2 } from "lucide-react";
+import { Check, LoaderCircle } from "lucide-react";
+import { CraftArt } from "@/components/craft-art";
 
-const steps = [
-  { label: "Reading PDF text", ms: 500 },
-  { label: "Detecting pattern structure", ms: 900 },
-  { label: "Extracting row instructions", ms: 1200 },
-  { label: "Checking stitch counts", ms: 900 },
-];
+const steps = ["Opening your PDF", "Finding sizes and materials", "Separating the instructions", "Checking every row"];
 
-export default function ProcessingPage() {
-  const router = useRouter();
-  const [stepIndex, setStepIndex] = useState(0);
-
-  useEffect(() => {
-    let i = 0;
-    let cancelled = false;
-    const next = () => {
-      if (cancelled) return;
-      if (i >= steps.length) {
-        router.push("/library/upload/review");
-        return;
-      }
-      const s = steps[i];
-      setStepIndex(i);
-      setTimeout(() => {
-        i += 1;
-        next();
-      }, s.ms);
-    };
-    next();
-    return () => {
-      cancelled = true;
-    };
-  }, [router]);
-
-  return (
-    <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-      <div className="relative mb-6 flex size-20 items-center justify-center">
-        <div className="absolute inset-0 animate-pulse rounded-full bg-primary/15" />
-        <div className="relative flex size-14 items-center justify-center rounded-full bg-primary/90 text-primary-foreground">
-          <Loader2 className="size-6 animate-spin" />
-        </div>
-      </div>
-      <h1 className="text-lg font-semibold tracking-tight">
-        Parsing your pattern
-      </h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Usually takes about 5 seconds
-      </p>
-
-      <div className="mt-8 w-full max-w-xs space-y-3 text-left">
-        {steps.map((s, i) => {
-          const done = i < stepIndex;
-          const active = i === stepIndex;
-          return (
-            <div
-              key={s.label}
-              className="flex items-center gap-3 text-sm"
-            >
-              <div
-                className={
-                  done
-                    ? "flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground"
-                    : active
-                      ? "flex size-5 items-center justify-center rounded-full bg-primary/20 text-primary"
-                      : "size-5 rounded-full border border-border"
-                }
-              >
-                {done && <Check className="size-3" strokeWidth={3} />}
-                {active && (
-                  <Loader2 className="size-3 animate-spin" strokeWidth={3} />
-                )}
-              </div>
-              <span
-                className={
-                  done || active ? "text-foreground" : "text-muted-foreground"
-                }
-              >
-                {s.label}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+export default function ProcessingPage(){
+  const router=useRouter(); const [step,setStep]=useState(0); const [name,setName]=useState("Your pattern");
+  useEffect(()=>{const upload=sessionStorage.getItem("stitchly:last-upload");const nameTimer=window.setTimeout(()=>{if(upload){try{setName(JSON.parse(upload).name)}catch{}}},0);const timer=window.setInterval(()=>setStep(current=>{if(current>=steps.length-1){window.clearInterval(timer);window.setTimeout(()=>router.push("/library/upload/review"),700);return current}return current+1}),850);return()=>{window.clearTimeout(nameTimer);window.clearInterval(timer)}},[router]);
+  return <div className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-5 py-10"><div className="w-full max-w-lg text-center">
+    <div className="relative mx-auto size-52"><span className="absolute inset-6 animate-ping rounded-full bg-[#59c3eb]/15"/><CraftArt art="basket" className="relative size-52 animate-[pulse_2s_ease-in-out_infinite]"/></div>
+    <p className="mt-2 text-xs font-extrabold uppercase tracking-[.18em] text-primary">Untangling</p><h1 className="font-heading mt-1 text-3xl font-black">Making this easier to follow</h1><p className="mx-auto mt-2 max-w-sm truncate text-sm text-muted-foreground">{name}</p>
+    <div className="stitch-card mx-auto mt-8 max-w-sm space-y-1 p-3 text-left">{steps.map((label,index)=><div key={label} className="flex items-center gap-3 rounded-2xl px-3 py-2.5"><span className={`flex size-7 items-center justify-center rounded-full ${index<step?"bg-[#dcedc8] text-[#2e6b46]":index===step?"bg-secondary text-[#17324d]":"bg-muted text-muted-foreground"}`}>{index<step?<Check className="size-4" strokeWidth={3}/>:index===step?<LoaderCircle className="size-4 animate-spin"/>:<span className="text-xs font-black">{index+1}</span>}</span><span className={`text-sm font-bold ${index<=step?"text-foreground":"text-muted-foreground"}`}>{label}</span></div>)}</div>
+    <p className="mt-5 text-xs text-muted-foreground">Keep this page open while we prepare the review.</p>
+  </div></div>
 }

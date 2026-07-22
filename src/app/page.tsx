@@ -1,152 +1,23 @@
+"use client";
+
 import Link from "next/link";
-import { ChevronRight, Search } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { patterns, projects, getPattern } from "@/lib/mock-data";
+import { useEffect, useState } from "react";
+import { ArrowRight, BookOpen, FileUp, Play, Sparkles } from "lucide-react";
+import { CraftArt } from "@/components/craft-art";
 
-export default function HomePage() {
-  const active = projects.filter((p) => p.status === "active");
-  const current = active[0];
-  const currentPattern = current && getPattern(current.patternId);
-  const recentPatterns = patterns.slice(0, 3);
+type Draft = { name: string; yarn: string; notes: string; patternId: string };
 
-  return (
-    <div className="flex flex-col">
-      {/* Greeting header */}
-      <div className="px-5 pt-6 pb-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">
-          Saturday afternoon
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-          Hello, Melissa
-        </h1>
-        <Link
-          href="/library"
-          className="mt-4 flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm text-muted-foreground"
-        >
-          <Search className="size-4" />
-          Search your patterns…
-        </Link>
-      </div>
-
-      {/* Continue making — hero */}
-      {current && currentPattern && (
-        <section className="px-5">
-          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Continue making
-          </p>
-          <Link
-            href={`/projects/${current.id}/reader`}
-            className="block overflow-hidden rounded-2xl border border-border bg-card transition active:scale-[0.99]"
-          >
-            <div className="flex items-center gap-4 p-4">
-              <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-accent text-3xl">
-                {currentPattern.cover}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{current.name}</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  Row {current.currentRow} of {currentPattern.totalRows}
-                </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <Progress
-                    value={(current.currentRow / currentPattern.totalRows) * 100}
-                    className="h-1.5"
-                  />
-                  <span className="text-[11px] font-medium tabular-nums text-muted-foreground">
-                    {Math.round(
-                      (current.currentRow / currentPattern.totalRows) * 100
-                    )}
-                    %
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between border-t border-border bg-primary/5 px-4 py-2.5 text-xs">
-              <span className="text-muted-foreground">
-                Last worked Friday evening
-              </span>
-              <span className="flex items-center gap-1 font-medium text-primary">
-                Pick up where you left off
-                <ChevronRight className="size-3.5" />
-              </span>
-            </div>
-          </Link>
-        </section>
-      )}
-
-      {/* Active projects */}
-      <section className="px-5 pt-6">
-        <div className="mb-2 flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold">Active projects</h2>
-          <Link
-            href="/projects"
-            className="text-xs font-medium text-primary"
-          >
-            See all
-          </Link>
-        </div>
-        <div className="space-y-2">
-          {active.map((p) => {
-            const pat = getPattern(p.patternId);
-            if (!pat) return null;
-            const pct = Math.round((p.currentRow / pat.totalRows) * 100);
-            return (
-              <Link
-                key={p.id}
-                href={`/projects/${p.id}`}
-                className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
-              >
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-xl">
-                  {pat.cover}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{p.name}</p>
-                  <p className="text-[11px] text-muted-foreground">
-                    Row {p.currentRow}/{pat.totalRows} • {pat.craft}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs font-semibold tabular-nums">{pct}%</p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Recently added patterns */}
-      <section className="px-5 pt-6 pb-6">
-        <div className="mb-2 flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold">Recently added</h2>
-          <Link href="/library" className="text-xs font-medium text-primary">
-            Library
-          </Link>
-        </div>
-        <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-1">
-          {recentPatterns.map((pat) => (
-            <Link
-              key={pat.id}
-              href={`/library/${pat.id}`}
-              className="w-36 shrink-0 rounded-xl border border-border bg-card p-3"
-            >
-              <div className="mb-2 flex aspect-square w-full items-center justify-center rounded-lg bg-accent text-4xl">
-                {pat.cover}
-              </div>
-              <p className="truncate text-xs font-semibold">{pat.name}</p>
-              <p className="truncate text-[10px] text-muted-foreground">
-                {pat.designer}
-              </p>
-              <Badge
-                variant="secondary"
-                className="mt-2 text-[10px] font-normal"
-              >
-                {pat.craft}
-              </Badge>
-            </Link>
-          ))}
-        </div>
-      </section>
+export default function HomePage(){
+  const [draft,setDraft]=useState<Draft|null>(null);
+  useEffect(()=>{const timer=window.setTimeout(()=>{const value=localStorage.getItem("stitchly:last-project");if(value){try{setDraft(JSON.parse(value))}catch{}}},0);return()=>window.clearTimeout(timer)},[]);
+  return <div className="pb-10">
+    <header className="relative overflow-hidden bg-[#f5a623] px-5 pb-9 pt-8 md:px-10"><div className="stitch-pattern absolute inset-0 opacity-35"/><div className="relative flex items-start justify-between"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#17324d]/65">Your craft corner</p><h1 className="font-heading mt-1 text-3xl font-black">What shall we make?</h1></div><Link href="/account" className="flex size-11 items-center justify-center rounded-2xl bg-white font-heading font-black text-primary shadow-sm">You</Link></div></header>
+    <div className="px-5 pt-7 md:px-10">
+      {draft ? <section className="stitch-card grid overflow-hidden md:grid-cols-[.8fr_1.2fr]"><div className="relative min-h-48 overflow-hidden bg-[#59c3eb]"><CraftArt art="scarf" className="absolute inset-4 m-auto size-40"/></div><div className="flex flex-col justify-center p-6"><p className="text-xs font-extrabold uppercase tracking-[.15em] text-primary">Continue making</p><h2 className="font-heading mt-1 text-2xl font-black">{draft.name}</h2><p className="mt-1 text-sm text-muted-foreground">Your newest project is ready.</p><Link href="/projects/aran-scarf-mum/reader" className="mt-5 inline-flex items-center gap-2 font-heading text-sm font-extrabold text-primary">Open reader <ArrowRight className="size-4"/></Link></div></section> : <EmptyHome/>}
+      <section className="mt-9"><p className="text-xs font-extrabold uppercase tracking-[.16em] text-primary">How Stitchly works</p><h2 className="font-heading mt-1 text-2xl font-black">From PDF to one clear row</h2><div className="mt-4 grid gap-3 md:grid-cols-3"><Step icon={FileUp} number="01" title="Add your pattern" body="Upload a private PDF from your phone or computer."/><Step icon={Sparkles} number="02" title="Check the rows" body="Review what we found and correct anything unclear."/><Step icon={Play} number="03" title="Start making" body="Move through one focused instruction at a time."/></div></section>
+      <Link href="/projects/aran-scarf-mum/reader" className="mt-8 flex items-center justify-between rounded-3xl bg-[#17324d] p-5 text-white"><div><p className="text-xs font-bold uppercase tracking-wider text-[#59c3eb]">Optional preview</p><p className="font-heading mt-1 text-lg font-extrabold">Try the reader with an example</p><p className="mt-1 text-xs text-white/65">This won’t be added to your projects.</p></div><ArrowRight className="size-5"/></Link>
     </div>
-  );
+  </div>
 }
+function EmptyHome(){return <section className="relative overflow-hidden rounded-3xl bg-[#f58ba2] p-6 pb-7 md:pr-72"><div className="absolute -right-7 -top-8 size-48 rounded-full bg-[#fff8ea]/70"/><CraftArt art="basket" className="relative mx-auto size-52 md:absolute md:-bottom-12 md:right-8"/><div className="relative"><p className="text-xs font-extrabold uppercase tracking-[.15em] text-[#17324d]/60">Nothing tangled yet</p><h2 className="font-heading mt-1 text-3xl font-black">Your first project starts with a pattern</h2><p className="mt-2 max-w-md text-sm text-[#17324d]/75">Bring along a PDF and we’ll turn it into a calm, trackable making experience.</p><Link href="/library/upload" className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-[#17324d] px-5 py-3 font-heading text-sm font-extrabold text-white"><BookOpen className="size-4"/>Add your first pattern</Link></div></section>}
+function Step({icon:Icon,number,title,body}:{icon:typeof FileUp;number:string;title:string;body:string}){return <div className="stitch-card p-5"><div className="flex items-center justify-between"><span className="flex size-10 items-center justify-center rounded-2xl bg-secondary"><Icon className="size-5"/></span><span className="font-heading text-sm font-black text-primary/50">{number}</span></div><h3 className="font-heading mt-4 font-extrabold">{title}</h3><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{body}</p></div>}

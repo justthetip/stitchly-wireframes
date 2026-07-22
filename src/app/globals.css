@@ -7,9 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
-  --font-heading: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-heading), ui-rounded, system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,30 +48,30 @@
 }
 
 :root {
-  --background: oklch(0.985 0.005 80);
-  --foreground: oklch(0.22 0.02 30);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.02 30);
+  --background: #fffaf0;
+  --foreground: #17324d;
+  --card: #ffffff;
+  --card-foreground: #17324d;
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.22 0.02 30);
-  --primary: oklch(0.56 0.16 25);
-  --primary-foreground: oklch(0.99 0.005 80);
-  --secondary: oklch(0.95 0.01 70);
+  --primary: #e85f50;
+  --primary-foreground: #fffaf0;
+  --secondary: #ffe6a8;
   --secondary-foreground: oklch(0.3 0.02 30);
-  --muted: oklch(0.96 0.008 70);
-  --muted-foreground: oklch(0.5 0.02 40);
-  --accent: oklch(0.93 0.04 70);
+  --muted: #f6efe3;
+  --muted-foreground: #657385;
+  --accent: #dff4fb;
   --accent-foreground: oklch(0.3 0.05 30);
   --destructive: oklch(0.55 0.22 27);
-  --border: oklch(0.9 0.01 60);
-  --input: oklch(0.9 0.01 60);
-  --ring: oklch(0.56 0.16 25);
+  --border: #eadfce;
+  --input: #e5d9c8;
+  --ring: #e85f50;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 1rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -123,8 +122,15 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: radial-gradient(circle at 10% 0%, rgb(245 166 35 / .10), transparent 28rem), radial-gradient(circle at 100% 90%, rgb(89 195 235 / .12), transparent 30rem);
   }
   html {
     @apply font-sans;
   }
+}
+
+@layer utilities {
+  .font-heading { font-family: var(--font-heading); }
+  .stitch-card { @apply rounded-3xl border bg-card shadow-[0_12px_35px_rgb(23_50_77_/_0.07)]; }
+  .stitch-pattern { background-image: linear-gradient(90deg, transparent 47%, rgb(255 255 255 / .45) 48%, rgb(255 255 255 / .45) 52%, transparent 53%), linear-gradient(transparent 47%, rgb(255 255 255 / .45) 48%, rgb(255 255 255 / .45) 52%, transparent 53%); background-size: 56px 56px; }
 }

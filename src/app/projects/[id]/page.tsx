@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MoreHorizontal, NotebookPen, Play } from "lucide-react";
+import { NotebookPen, Play, ArrowRight } from "lucide-react";
 import { ScreenHeader } from "@/components/screen-header";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { getProject, getPattern } from "@/lib/mock-data";
+import { PatternArt } from "@/components/craft-art";
 
 export default async function ProjectDetailPage({
   params,
@@ -22,19 +23,12 @@ export default async function ProjectDetailPage({
 
   return (
     <div className="flex flex-col pb-6">
-      <ScreenHeader
-        back="/projects"
-        title={proj.name}
-        right={
-          <button className="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-muted">
-            <MoreHorizontal className="size-5" />
-          </button>
-        }
-      />
+      <ScreenHeader back="/projects" title={proj.name} />
 
       <div className="px-5 pt-5">
-        <div className="flex aspect-[4/3] w-full items-center justify-center rounded-2xl bg-accent text-7xl">
-          {pat.cover}
+        <div className="relative flex aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-3xl bg-[#ffe6a8]">
+          <div className="stitch-pattern absolute inset-0 opacity-30" />
+          <PatternArt index={proj.patternId === "aran-scarf" ? 0 : 1} className="size-52" />
         </div>
 
         <div className="mt-4">
@@ -44,12 +38,12 @@ export default async function ProjectDetailPage({
           >
             {pat.name} →
           </Link>
-          <h1 className="mt-1 text-xl font-semibold tracking-tight">
+          <h1 className="font-heading mt-1 text-2xl font-black tracking-tight">
             {proj.name}
           </h1>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <div className="stitch-card mt-4 p-5">
           <div className="flex items-baseline justify-between">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Progress
@@ -61,7 +55,7 @@ export default async function ProjectDetailPage({
             <span>
               Row {proj.currentRow} of {pat.totalRows}
             </span>
-            <span>Last worked Friday</span>
+            <span>Updated 21 June</span>
           </div>
           <Link
             href={`/projects/${proj.id}/reader`}
@@ -76,10 +70,10 @@ export default async function ProjectDetailPage({
       <section className="px-5 pt-6">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-semibold">Notes</h2>
-          <button className="flex items-center gap-1 text-xs font-medium text-primary">
+          <Link href={`/projects/${proj.id}/reader`} className="flex items-center gap-1 text-xs font-bold text-primary">
             <NotebookPen className="size-3.5" />
-            Add note
-          </button>
+            Add in reader <ArrowRight className="size-3"/>
+          </Link>
         </div>
         {proj.notes.length === 0 ? (
           <p className="rounded-xl border border-dashed border-border bg-card p-4 text-xs text-muted-foreground">
@@ -94,7 +88,7 @@ export default async function ProjectDetailPage({
               >
                 <p className="text-xs leading-relaxed">{n}</p>
                 <p className="mt-1.5 text-[10px] text-muted-foreground">
-                  Row 30 • added Mon
+                  Row 30 • 16 June
                 </p>
               </div>
             ))}

@@ -18,7 +18,7 @@ export function ScreenHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-5 py-3 backdrop-blur",
+        "sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border/70 bg-background/90 px-5 py-4 backdrop-blur-xl md:px-8",
         className
       )}
     >
@@ -34,7 +34,7 @@ export function ScreenHeader({
         )}
         <div className="min-w-0">
           {title && (
-            <h1 className="truncate text-base font-semibold tracking-tight">
+            <h1 className="font-heading truncate text-lg font-extrabold tracking-tight">
               {title}
             </h1>
           )}

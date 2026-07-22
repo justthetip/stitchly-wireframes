@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookOpen, Layers, Plus } from "lucide-react";
+import { Home, BookOpen, Layers, Plus, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -13,6 +13,7 @@ const tabs = [
     icon: BookOpen,
     match: (p: string) => p.startsWith("/library"),
   },
+  { href: "/account", label: "You", icon: UserRound, match: (p: string) => p.startsWith("/account") },
   {
     href: "/projects",
     label: "Projects",
@@ -24,12 +25,12 @@ const tabs = [
 export function BottomNav() {
   const pathname = usePathname();
   // Hide nav on the immersive reader screen
-  const isReader = /^\/projects\/[^/]+\/reader/.test(pathname);
+  const isReader = /^\/projects\/[^/]+\/reader/.test(pathname) || pathname === "/sign-in";
   if (isReader) return null;
 
   return (
-    <nav className="absolute inset-x-0 bottom-0 border-t border-border bg-background/95 backdrop-blur">
-      <div className="relative grid grid-cols-3">
+    <nav className="absolute inset-x-0 bottom-0 z-30 border-t border-border/80 bg-background/90 backdrop-blur-xl">
+      <div className="relative mx-auto grid max-w-xl grid-cols-4">
         {tabs.map((tab) => {
           const active = tab.match(pathname);
           const Icon = tab.icon;
@@ -38,7 +39,7 @@ export function BottomNav() {
               key={tab.href}
               href={tab.href}
               className={cn(
-                "flex flex-col items-center gap-1 py-3 text-[10px] font-medium tracking-wide uppercase",
+                "flex flex-col items-center gap-1 py-3 text-[10px] font-bold tracking-wide",
                 active ? "text-primary" : "text-muted-foreground"
               )}
             >
@@ -50,7 +51,7 @@ export function BottomNav() {
         <Link
           href="/library/upload"
           aria-label="Add pattern"
-          className="absolute -top-6 left-1/2 -translate-x-1/2 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 ring-4 ring-background"
+          className="absolute -top-7 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 ring-4 ring-background rotate-3"
         >
           <Plus className="size-5" strokeWidth={2.5} />
         </Link>

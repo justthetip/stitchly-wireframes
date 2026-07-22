@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getPattern, projects } from "@/lib/mock-data";
+import { PatternArt } from "@/components/craft-art";
 
 export default async function PatternDetailPage({
   params,
@@ -31,8 +32,9 @@ export default async function PatternDetailPage({
       />
 
       <div className="px-5 pt-5">
-        <div className="flex aspect-[4/3] w-full items-center justify-center rounded-2xl bg-accent text-7xl">
-          {pat.cover}
+        <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-3xl bg-accent">
+          <div className="absolute -right-10 -top-10 size-40 rounded-full bg-[#f58ba2]/60" />
+          <PatternArt index={patternsIndex(pat.id)} className="relative size-52" />
         </div>
         <div className="mt-4">
           <h1 className="text-xl font-semibold tracking-tight">{pat.name}</h1>
@@ -124,6 +126,8 @@ export default async function PatternDetailPage({
     </div>
   );
 }
+
+function patternsIndex(id: string) { return ["aran-scarf", "amigurumi-bunny", "ribbed-beanie", "granny-square"].indexOf(id); }
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (

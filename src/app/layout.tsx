@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Nunito, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import { PhoneFrame } from "@/components/phone-frame";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const nunitoSans = Nunito_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const nunito = Nunito({
+  variable: "--font-heading",
   subsets: ["latin"],
+  weight: ["700", "800", "900"],
 });
 
 export const metadata: Metadata = {
-  title: "Stitchly — wireframes",
-  description: "Mobile-first knitting & crochet companion. Throwaway wireframe build.",
+  title: "Stitchly — keep your place",
+  description: "Your patterns, projects and progress in one joyful place.",
 };
 
 export default function RootLayout({
@@ -26,9 +27,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      className={`${nunitoSans.variable} ${nunito.variable} antialiased`}
     >
-      <body className="min-h-dvh bg-[oklch(0.96_0.01_70)]">
+      <body className="min-h-dvh bg-background">
         <PhoneFrame>{children}</PhoneFrame>
       </body>
     </html>

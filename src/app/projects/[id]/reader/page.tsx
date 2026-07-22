@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import {
   Check,
   ChevronLeft,
   ChevronRight,
   Eye,
-  MoreVertical,
   NotebookPen,
   X,
 } from "lucide-react";
@@ -24,6 +23,7 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { loadProgress, saveProgress } from "@/lib/persistence";
 
 export default function ReaderPage({
   params,
@@ -37,16 +37,29 @@ export default function ReaderPage({
   if (!pat) notFound();
 
   // Use real parsed rows where we have them; pad with placeholders otherwise.
-  const rows =
-    proj.patternId === "aran-scarf"
-      ? aranScarfRows
-      : aranScarfRows.slice(0, pat.totalRows);
+  const rows = useMemo(() => Array.from({ length: pat.totalRows }, (_, index) => {
+    const source = aranScarfRows[index % aranScarfRows.length];
+    return { ...source, n: index + 1, section: index % 8 === 0 ? (index === 0 ? "Set-up" : `Repeat ${Math.floor(index / 8)}`) : undefined };
+  }), [pat.totalRows]);
 
   const [rowIndex, setRowIndex] = useState(
     Math.min(proj.currentRow - 1, rows.length - 1)
   );
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
+  const [notes, setNotes] = useState<Record<number, string>>({});
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const saved = loadProgress(proj.id, proj.currentRow);
+      setRowIndex(Math.min(saved.row - 1, rows.length - 1));
+      setNotes(saved.notes);
+      setHydrated(true);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [proj.id, proj.currentRow, rows.length]);
+  useEffect(() => { if (hydrated) saveProgress(proj.id, { row: rowIndex + 1, notes }); }, [hydrated, notes, proj.id, rowIndex]);
 
   const row = rows[rowIndex];
   const prev = rowIndex > 0 ? rows[rowIndex - 1] : null;
@@ -54,9 +67,9 @@ export default function ReaderPage({
   const pct = Math.round(((rowIndex + 1) / pat.totalRows) * 100);
 
   return (
-    <div className="flex h-full flex-col bg-background">
+    <div className="mx-auto flex min-h-[calc(100dvh-3rem)] max-w-3xl flex-col bg-background">
       {/* Top bar */}
-      <header className="flex items-center justify-between border-b border-border px-3 py-3">
+      <header className="flex items-center justify-between border-b border-border/70 bg-white/70 px-3 py-3 backdrop-blur">
         <Link
           href={`/projects/${proj.id}`}
           className="-ml-1 flex size-9 items-center justify-center rounded-full text-foreground hover:bg-muted"
@@ -68,13 +81,11 @@ export default function ReaderPage({
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
             {proj.name}
           </p>
-          <p className="text-xs font-semibold">
+          <p className="font-heading text-sm font-extrabold">
             Row {row.n} of {pat.totalRows}
           </p>
         </div>
-        <button className="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-muted">
-          <MoreVertical className="size-5" />
-        </button>
+        <span className="flex size-9 items-center justify-center rounded-full bg-secondary text-[10px] font-black">{pct}%</span>
       </header>
 
       {/* Progress */}
@@ -108,7 +119,8 @@ export default function ReaderPage({
 
       {/* Current row — the focus */}
       <div className="flex flex-1 flex-col items-stretch justify-center px-5 py-4">
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="stitch-card relative overflow-hidden p-6 md:p-8">
+          <div className="absolute right-0 top-0 h-full w-2 bg-[#f5a623]" />
           <div className="flex items-baseline justify-between">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-primary">
               Row {row.n}
@@ -119,17 +131,17 @@ export default function ReaderPage({
               </span>
             )}
           </div>
-          <p className="mt-3 text-xl leading-relaxed font-medium tracking-tight">
+          <p className="font-heading mt-4 text-2xl font-extrabold leading-relaxed tracking-tight md:text-3xl">
             {row.instructions}
           </p>
 
           <div className="mt-4 flex items-center gap-2">
             <button
-              onClick={() => setNoteOpen(true)}
+              onClick={() => { setNoteText(notes[row.n] ?? ""); setNoteOpen(true); }}
               className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground"
             >
               <NotebookPen className="size-3.5" />
-              Add note
+              {notes[row.n] ? "Edit note" : "Add note"}
             </button>
             <button className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground">
               <Eye className="size-3.5" />
@@ -152,7 +164,7 @@ export default function ReaderPage({
       )}
 
       {/* Sticky action bar */}
-      <div className="border-t border-border bg-background px-3 py-3">
+      <div className="sticky bottom-0 border-t border-border bg-background/95 px-3 py-3 backdrop-blur">
         <div className="flex items-stretch gap-2">
           <button
             onClick={() => setRowIndex((i) => Math.max(0, i - 1))}
@@ -203,6 +215,7 @@ export default function ReaderPage({
           <SheetFooter>
             <Button
               onClick={() => {
+                setNotes((current) => ({ ...current, [row.n]: noteText }));
                 setNoteText("");
                 setNoteOpen(false);
               }}
