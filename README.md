@@ -22,7 +22,12 @@ The current build validates the core journey:
 - Next.js 16 App Router, React 19 and Tailwind CSS 4
 - Neon Postgres and Neon Auth (Google plus email/password)
 - Private Vercel Blob storage for uploaded pattern files
+- Server-side PDF text extraction with `unpdf` and deterministic row parsing
 - Vercel deployment from the `main` branch
+
+Every data route resolves the authenticated Neon user and scopes reads and
+writes by `owner_id`. Original PDFs remain private and are streamed through an
+authenticated route rather than exposed as public Blob URLs.
 
 ## Local development
 
